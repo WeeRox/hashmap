@@ -4,13 +4,6 @@
 
 #define INITIAL_CAPACITY 1 << 4
 
-struct hashmap_entry
-{
-	void *key;
-	void *value;
-	struct hashmap_entry *next;
-};
-
 struct hashmap *hashmap_init(unsigned int key_size, unsigned int value_size, unsigned int (*hashmap_hash)(struct hashmap *, void *))
 {
 	struct hashmap *map;
@@ -154,5 +147,52 @@ void hashmap_put(struct hashmap *map, void *key, void *value)
 	if (map->size == map->capacity)
 	{
 		hashmap_rehash(map);
+	}
+}
+
+struct hashmap_iterator *hashmap_iterator(struct hashmap *map)
+{
+	struct hashmap_iterator *iter;
+	if ((iter = malloc(sizeof(struct hashmap_iterator))) == NULL)
+	{
+		return NULL;
+	}
+
+	if (map->size == 0)
+	{
+		return NULL;
+	}
+
+	for (int i = 0; i < map->capacity; i++)
+	{
+		for (struct hashmap_entry *entry = *(map->entries + i); entry != NULL; entry = entry->next)
+		{
+			iter->entry = entry;
+			iter->index = i;
+			return iter;
+		}
+	}
+	return NULL;
+}
+
+struct hashmap_iterator *hashmap_iterator_next(struct hashmap *map, struct hashmap_iterator *iter)
+{
+	if (iter->entry->next == NULL)
+	{
+		for (int i = iter->index + 1; i < map->capacity; i++)
+		{
+			for (struct hashmap_entry *entry = *(map->entries + i); entry != NULL; entry = entry->next)
+			{
+				iter->entry = entry;
+				iter->index = i;
+				return iter;
+			}
+		}
+		return NULL;
+	}
+	else
+	{
+		iter->entry = iter->entry->next;
+		return iter;
 	}
 }
