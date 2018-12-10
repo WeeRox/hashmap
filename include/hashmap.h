@@ -24,7 +24,7 @@ struct hashmap_iterator
 	struct hashmap_entry *entry;
 };
 
-struct hashmap *hashmap_init(unsigned int key_size, unsigned int values_size, unsigned int (*hashmap_hash)(struct hashmap *, void *));
+struct hashmap *hashmap_init(unsigned int key_size, unsigned int value_size, unsigned int (*hashmap_hash)(struct hashmap *, void *));
 void hashmap_free(struct hashmap *map);
 
 void *hashmap_get(struct hashmap *map, void *key);
